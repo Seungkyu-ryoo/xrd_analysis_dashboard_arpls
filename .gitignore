@@ -1,0 +1,11 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+*.xlsx
+*.xls
+*.xlsm
+*.xye
+outputs/
+export/
