@@ -1,9 +1,12 @@
 __pycache__/
 *.py[cod]
+.DS_Store
 .venv/
+.venv-*/
 venv/
 
 *.xlsx
+!xrd_dashboard/resources/ReferencePeaks.xlsx
 *.xls
 *.xlsm
 *.xye

@@ -1,0 +1,83 @@
+from __future__ import annotations
+
+import os
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+PROJECT_PARENT = PROJECT_DIR.parent
+
+
+class ImportSmokeTests(unittest.TestCase):
+    def _assert_launcher_importable(
+        self, module_name: str, working_directory: Path
+    ) -> None:
+        code = f"import {module_name} as launcher; assert callable(launcher.main)"
+        with tempfile.TemporaryDirectory() as mpl_config:
+            environment = os.environ.copy()
+            environment["MPLCONFIGDIR"] = mpl_config
+            environment["PYTHONDONTWRITEBYTECODE"] = "1"
+            completed = subprocess.run(
+                [sys.executable, "-B", "-c", code],
+                cwd=working_directory,
+                env=environment,
+                text=True,
+                capture_output=True,
+                timeout=60,
+                check=False,
+            )
+        self.assertEqual(
+            completed.returncode,
+            0,
+            msg=f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}",
+        )
+
+    def test_package_main_launcher_imports_without_starting_the_gui(self):
+        self._assert_launcher_importable(
+            "xrd_analysis_dashboard_arpls.main", PROJECT_PARENT
+        )
+
+    def test_direct_main_launcher_imports_without_starting_the_gui(self):
+        self._assert_launcher_importable("main", PROJECT_DIR)
+
+    def test_direct_legacy_fitting_imports_remain_available(self):
+        code = (
+            "from fitting import run_optimization; "
+            "from fitting_arpls import run_arpls; "
+            "assert callable(run_optimization); assert callable(run_arpls)"
+        )
+        environment = os.environ.copy()
+        environment["PYTHONDONTWRITEBYTECODE"] = "1"
+        completed = subprocess.run(
+            [sys.executable, "-B", "-c", code],
+            cwd=PROJECT_DIR,
+            env=environment,
+            text=True,
+            capture_output=True,
+            timeout=60,
+            check=False,
+        )
+        self.assertEqual(
+            completed.returncode,
+            0,
+            msg=f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}",
+        )
+
+    def test_package_exports_background_fitter_and_arpls(self):
+        if str(PROJECT_PARENT) not in sys.path:
+            sys.path.insert(0, str(PROJECT_PARENT))
+        import xrd_analysis_dashboard_arpls as dashboard
+
+        self.assertEqual(
+            set(dashboard.__all__), {"BackgroundFitter", "run_arpls"}
+        )
+        self.assertTrue(callable(dashboard.BackgroundFitter))
+        self.assertTrue(callable(dashboard.run_arpls))
+
+
+if __name__ == "__main__":
+    unittest.main()
