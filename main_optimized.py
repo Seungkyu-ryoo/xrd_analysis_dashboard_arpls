@@ -1,12 +1,13 @@
 """Backward-compatible dashboard entry point.
 
-New code should import focused helpers from ``analysis`` and ``data_io`` or run
-``main.py``.  These re-exports preserve existing beamtime scripts that import
+New code should import focused helpers from ``xrd_dashboard`` or run
+``main.py``. These re-exports preserve existing beamtime scripts that import
 public names from the historical ``main_optimized`` module.
 """
 
 if __package__:
-    from .analysis import (
+    from .xrd_dashboard.analysis import (
+        BackgroundFitter,
         MAX_FIT_WORKERS,
         compute_fit_jobs,
         compute_position,
@@ -20,11 +21,16 @@ if __package__:
         validate_background_q_support,
         validate_q_range,
     )
-    from .app import XRDDashboard, enable_high_dpi, ensure_supported_tk, main
-    from .data_io import load_reference_peaks, read_multisheet
-    from .fitting_optimized import BackgroundFitter
+    from .xrd_dashboard.data import load_reference_peaks, read_multisheet
+    from .xrd_dashboard.ui.app import (
+        XRDDashboard,
+        enable_high_dpi,
+        ensure_supported_tk,
+        main,
+    )
 else:
-    from analysis import (
+    from xrd_dashboard.analysis import (
+        BackgroundFitter,
         MAX_FIT_WORKERS,
         compute_fit_jobs,
         compute_position,
@@ -38,9 +44,13 @@ else:
         validate_background_q_support,
         validate_q_range,
     )
-    from app import XRDDashboard, enable_high_dpi, ensure_supported_tk, main
-    from data_io import load_reference_peaks, read_multisheet
-    from fitting_optimized import BackgroundFitter
+    from xrd_dashboard.data import load_reference_peaks, read_multisheet
+    from xrd_dashboard.ui.app import (
+        XRDDashboard,
+        enable_high_dpi,
+        ensure_supported_tk,
+        main,
+    )
 
 
 __all__ = [

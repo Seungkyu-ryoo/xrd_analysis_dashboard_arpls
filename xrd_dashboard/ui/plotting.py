@@ -22,14 +22,16 @@ from matplotlib.figure import Figure
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 
-try:  # Support package imports and execution from this directory.
-    from .analysis import split_position
-    from .data_io import REFERENCE_COLORS, REFERENCE_PHASES
-    from .theme import BG_APP, BG_CARD, BORDER_COLOR, COLOR_MUTED, FG_TEXT
-except ImportError:  # pragma: no cover - exercised by direct-script imports.
-    from analysis import split_position
-    from data_io import REFERENCE_COLORS, REFERENCE_PHASES
-    from theme import BG_APP, BG_CARD, BORDER_COLOR, COLOR_MUTED, FG_TEXT
+from ..analysis.pipeline import split_position
+from ..data.workbooks import REFERENCE_PHASES
+from .theme import (
+    BG_APP,
+    BG_CARD,
+    BORDER_COLOR,
+    COLOR_MUTED,
+    FG_TEXT,
+    REFERENCE_COLORS,
+)
 
 
 LegendMode = Literal["Auto", "Legend", "Colorbar", "None"]

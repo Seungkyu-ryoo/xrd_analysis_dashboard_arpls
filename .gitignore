@@ -5,6 +5,7 @@ __pycache__/
 venv/
 
 *.xlsx
+!xrd_dashboard/resources/ReferencePeaks.xlsx
 *.xls
 *.xlsm
 *.xye

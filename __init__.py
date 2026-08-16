@@ -1,6 +1,5 @@
-"""XRD analysis dashboard package."""
+"""Compatibility exports for the XRD analysis dashboard repository."""
 
-from .fitting_arpls import run_arpls
-from .fitting_optimized import BackgroundFitter
+from .xrd_dashboard import BackgroundFitter, run_arpls
 
 __all__ = ["BackgroundFitter", "run_arpls"]

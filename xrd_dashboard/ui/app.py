@@ -10,7 +10,6 @@ import sys
 import queue
 import threading
 import warnings
-
 import numpy as np
 
 import tkinter as tk
@@ -19,110 +18,58 @@ from tkinter import ttk, filedialog, messagebox
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 from matplotlib.figure import Figure
 
-if __package__:  # Support package/module execution from the repository root.
-    from .analysis import (
-        MAX_FIT_WORKERS,
-        compute_fit_jobs,
-        expanded_background_q_range,
-        numeric_sort_key,
-        parse_anchor_lines,
-        parse_peak_lines,
-        q_to_2theta,
-        safe_filename_component,
-        validate_background_q_support,
-        validate_q_range,
-    )
-    from .data_io import (
-        REFERENCE_FILENAME,
-        load_reference_peaks,
-        read_multisheet,
-    )
-    from .fitting_optimized import BackgroundFitter
-    from .exporting import write_export
-    from .plotting import PlotOptions, render_dashboard_figure
-    from .theme import (
-        BG_APP,
-        BG_CARD,
-        BG_PANEL,
-        BORDER_COLOR,
-        COLOR_MUTED,
-        COLOR_PRIMARY,
-        COLOR_SUCCESS,
-        COLOR_WARN,
-        DISABLED_FG,
-        FG_TEXT,
-        FONT_BODY,
-        FONT_H1,
-        FONT_H2,
-        FONT_MONO,
-        FONT_SMALL,
-        INPUT_BG,
-        INPUT_FG,
-        INPUT_SELECTION_BG,
-        INPUT_SELECTION_FG,
-        LOG_BG,
-        LOG_FG,
-        STATUS_ERROR,
-        STATUS_ERROR_BG,
-        STATUS_INFO,
-        STATUS_INFO_BG,
-        STATUS_BUSY_BG,
-        STATUS_NEUTRAL_BG,
-        STATUS_READY_BG,
-        configure_ttk_styles,
-    )
-else:  # Support direct imports and `python app.py` from this directory.
-    from analysis import (
-        MAX_FIT_WORKERS,
-        compute_fit_jobs,
-        expanded_background_q_range,
-        numeric_sort_key,
-        parse_anchor_lines,
-        parse_peak_lines,
-        q_to_2theta,
-        safe_filename_component,
-        validate_background_q_support,
-        validate_q_range,
-    )
-    from data_io import (
-        REFERENCE_FILENAME,
-        load_reference_peaks,
-        read_multisheet,
-    )
-    from fitting_optimized import BackgroundFitter
-    from exporting import write_export
-    from plotting import PlotOptions, render_dashboard_figure
-    from theme import (
-        BG_APP,
-        BG_CARD,
-        BG_PANEL,
-        BORDER_COLOR,
-        COLOR_MUTED,
-        COLOR_PRIMARY,
-        COLOR_SUCCESS,
-        COLOR_WARN,
-        DISABLED_FG,
-        FG_TEXT,
-        FONT_BODY,
-        FONT_H1,
-        FONT_H2,
-        FONT_MONO,
-        FONT_SMALL,
-        INPUT_BG,
-        INPUT_FG,
-        INPUT_SELECTION_BG,
-        INPUT_SELECTION_FG,
-        LOG_BG,
-        LOG_FG,
-        STATUS_ERROR,
-        STATUS_ERROR_BG,
-        STATUS_INFO,
-        STATUS_INFO_BG,
-        STATUS_BUSY_BG,
-        STATUS_NEUTRAL_BG,
-        STATUS_READY_BG,
-        configure_ttk_styles,
-    )
+from ..analysis import (
+    MAX_FIT_WORKERS,
+    BackgroundFitter,
+    compute_fit_jobs,
+    expanded_background_q_range,
+    numeric_sort_key,
+    parse_anchor_lines,
+    parse_peak_lines,
+    q_to_2theta,
+    safe_filename_component,
+    validate_background_q_support,
+    validate_q_range,
+)
+from ..data import (
+    REFERENCE_FILENAME,
+    load_reference_peaks,
+    read_multisheet,
+    write_export,
+)
+from ..paths import BUNDLED_REFERENCE_PATH, PROJECT_ROOT
+from .plotting import PlotOptions, render_dashboard_figure
+from .theme import (
+    BG_APP,
+    BG_CARD,
+    BG_PANEL,
+    BORDER_COLOR,
+    COLOR_MUTED,
+    COLOR_PRIMARY,
+    COLOR_SUCCESS,
+    COLOR_WARN,
+    DISABLED_FG,
+    FG_TEXT,
+    FONT_BODY,
+    FONT_H1,
+    FONT_H2,
+    FONT_MONO,
+    FONT_SMALL,
+    INPUT_BG,
+    INPUT_FG,
+    INPUT_SELECTION_BG,
+    INPUT_SELECTION_FG,
+    LOG_BG,
+    LOG_FG,
+    STATUS_BUSY_BG,
+    STATUS_ERROR,
+    STATUS_ERROR_BG,
+    STATUS_INFO,
+    STATUS_INFO_BG,
+    STATUS_NEUTRAL_BG,
+    STATUS_READY_BG,
+    configure_ttk_styles,
+)
 
 CMAP_OPTIONS = {
     "Accessible (recommended)": None,
@@ -441,13 +388,9 @@ class XRDDashboard:
         border, card = self._card(parent, "1. Data Load & Setup")
         border.pack(fill=tk.X, pady=(0, 10))
 
-        project_dir = os.path.dirname(os.path.abspath(__file__))
-        self.target_file_var = tk.StringVar(
-            value=os.path.join(project_dir, "Combi2.xlsx")
-        )
-        self.bg_file_var = tk.StringVar(
-            value=os.path.join(project_dir, "Combi16.xlsx")
-        )
+        project_dir = str(PROJECT_ROOT)
+        self.target_file_var = tk.StringVar(value="")
+        self.bg_file_var = tk.StringVar(value="")
         self.q_min_var = tk.StringVar(value="1.60")
         self.q_max_var = tk.StringVar(value="3.70")
 
@@ -457,7 +400,9 @@ class XRDDashboard:
                 filepath = filedialog.askopenfilename(
                     title=title,
                     initialdir=(
-                        os.path.dirname(current) if os.path.dirname(current) else None
+                        os.path.dirname(current)
+                        if os.path.dirname(current)
+                        else project_dir
                     ),
                     filetypes=[
                         ("Excel workbooks", "*.xlsx *.xls"),
@@ -1778,9 +1723,9 @@ class XRDDashboard:
             candidates.append(
                 os.path.join(os.path.dirname(os.path.abspath(t_path)), REF_FILENAME)
             )
-        candidates.append(
-            os.path.join(os.path.dirname(os.path.abspath(__file__)), REF_FILENAME)
-        )
+        candidates.append(str(BUNDLED_REFERENCE_PATH))
+        # Preserve support for checkouts created before resources were grouped.
+        candidates.append(str(PROJECT_ROOT / REF_FILENAME))
         candidates.append(os.path.abspath(REF_FILENAME))
         for c in candidates:
             if os.path.exists(c):

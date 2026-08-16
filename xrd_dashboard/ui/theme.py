@@ -21,6 +21,7 @@ INPUT_FG = "#172033"
 FG_TEXT = "#172033"
 BORDER_COLOR = "#CBD5E1"
 COLOR_MUTED = "#475569"
+REFERENCE_COLORS = ("#C2414B", "#2F855A", "#3157A4", "#C05621", "#7B2CBF")
 
 # Actions.  White text on each normal/hover action colour is WCAG AA (4.5:1)
 # or better.  Secondary buttons use the dark foreground declared below.
@@ -363,6 +364,7 @@ __all__ = [
     "COLOR_SECONDARY",
     "COLOR_HOVER_SECONDARY",
     "COLOR_MUTED",
+    "REFERENCE_COLORS",
     "BUTTON_FG",
     "INPUT_SELECTION_BG",
     "INPUT_SELECTION_FG",

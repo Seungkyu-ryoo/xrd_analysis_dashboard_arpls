@@ -13,12 +13,8 @@ from typing import Any, Callable, Iterable, Mapping, Optional
 
 import numpy as np
 
-try:  # Support package imports and execution from this directory.
-    from .fitting_arpls import run_arpls
-    from .fitting_optimized import FLEX_BOUNDS, RIGID_BOUNDS
-except ImportError:  # pragma: no cover - exercised by direct-script imports.
-    from fitting_arpls import run_arpls
-    from fitting_optimized import FLEX_BOUNDS, RIGID_BOUNDS
+from .baseline import run_arpls
+from .fitting import FLEX_BOUNDS, RIGID_BOUNDS
 
 
 MAX_FIT_WORKERS = 4

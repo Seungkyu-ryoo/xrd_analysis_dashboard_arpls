@@ -17,10 +17,11 @@ from typing import Any, Callable, Iterable, Iterator, Mapping, Optional
 import numpy as np
 import pandas as pd
 
-if __package__:  # Support package imports from the repository parent.
-    from .analysis import make_param_record, safe_filename_component, split_position
-else:  # Support ``import exporting`` from this directory.
-    from analysis import make_param_record, safe_filename_component, split_position
+from ..analysis.pipeline import (
+    make_param_record,
+    safe_filename_component,
+    split_position,
+)
 
 
 ErrorCallback = Callable[[str, BaseException], None]

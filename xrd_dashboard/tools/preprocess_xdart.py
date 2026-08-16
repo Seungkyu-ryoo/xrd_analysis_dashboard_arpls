@@ -9,7 +9,7 @@ The transformation intentionally matches the March 2026 organizer archived in
 
 The output is one multi-sheet workbook per combi condition and one workbook for
 the fused-silica reference background.  Every data sheet contains ``Q`` in the
-first column, which is the format consumed by ``main_optimized.py``.
+first column, which is the format consumed by the dashboard.
 """
 
 from __future__ import annotations

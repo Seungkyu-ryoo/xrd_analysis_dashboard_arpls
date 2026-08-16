@@ -9,11 +9,11 @@ import numpy as np
 import pandas as pd
 
 
-PROJECT_PARENT = Path(__file__).resolve().parents[2]
-if str(PROJECT_PARENT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_PARENT))
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
 
-from xrd_analysis_dashboard_arpls.analysis import (  # noqa: E402
+from xrd_dashboard.analysis import (  # noqa: E402
     compute_fit_jobs,
     compute_position,
     expanded_background_q_range,
@@ -27,7 +27,7 @@ from xrd_analysis_dashboard_arpls.analysis import (  # noqa: E402
     validate_background_q_support,
     validate_q_range,
 )
-import xrd_analysis_dashboard_arpls.analysis as analysis_module  # noqa: E402
+import xrd_dashboard.analysis.pipeline as analysis_module  # noqa: E402
 
 
 class ParsingTests(unittest.TestCase):

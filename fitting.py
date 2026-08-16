@@ -1,9 +1,9 @@
 """Compatibility API for the original dashboard fitting entry point."""
 
 if __package__:
-    from .fitting_optimized import BackgroundFitter
+    from .xrd_dashboard.analysis import BackgroundFitter
 else:
-    from fitting_optimized import BackgroundFitter
+    from xrd_dashboard.analysis import BackgroundFitter
 
 
 def run_optimization(

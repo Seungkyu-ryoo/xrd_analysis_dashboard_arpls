@@ -1,24 +1,55 @@
 from __future__ import annotations
 
+import inspect
 import sys
 import unittest
+import warnings
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
+from pybaselines.utils import ParameterWarning
 
 
-PROJECT_PARENT = Path(__file__).resolve().parents[2]
-if str(PROJECT_PARENT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_PARENT))
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
 
-from xrd_analysis_dashboard_arpls.fitting import run_optimization  # noqa: E402
-from xrd_analysis_dashboard_arpls.fitting_optimized import (  # noqa: E402
-    BackgroundFitter,
-)
+from fitting import run_optimization  # noqa: E402
+from fitting_arpls import run_arpls  # noqa: E402
+from xrd_dashboard.analysis import BackgroundFitter  # noqa: E402
 
 
 class FittingCompatibilityTests(unittest.TestCase):
+    def test_legacy_function_signatures_and_arpls_result_schema(self):
+        self.assertEqual(
+            tuple(inspect.signature(run_optimization).parameters),
+            (
+                "target_pos",
+                "anchor_list",
+                "peak_list",
+                "df_target",
+                "df_bg",
+                "q_target",
+                "q_bg",
+                "bg_cols",
+            ),
+        )
+        self.assertEqual(
+            tuple(inspect.signature(run_arpls).parameters),
+            ("x_data", "y_data", "lam"),
+        )
+
+        q_values = np.linspace(1.5, 3.5, 101)
+        signal = 10.0 + q_values + np.exp(-((q_values - 2.4) / 0.08) ** 2)
+        with warnings.catch_warnings():
+            warnings.simplefilter("ignore", ParameterWarning)
+            result = run_arpls(q_values, signal, lam=1e4)
+        self.assertEqual(set(result), {"bkg_arpls", "cleaned_y", "params"})
+        np.testing.assert_allclose(
+            result["bkg_arpls"] + result["cleaned_y"], signal
+        )
+
     def test_legacy_wrapper_matches_background_fitter(self):
         q_target = np.linspace(1.5, 3.5, 61)
         q_background = np.linspace(1.35, 3.75, 101)

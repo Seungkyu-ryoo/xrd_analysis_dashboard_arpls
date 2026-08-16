@@ -14,7 +14,8 @@ On macOS, use a Miniconda Python that includes a current Tk. Avoid virtual
 environments created from Apple's Command Line Tools Python when it provides the
 legacy Tk 8.5, which renders several widgets incorrectly.
 
-From this directory:
+All commands below assume the repository root (the directory containing
+`main.py`). From this directory:
 
 ```bash
 /opt/homebrew/Caskroom/miniconda/base/bin/python -m venv .venv
@@ -28,20 +29,20 @@ Tkinter comes from the Python/Conda installation rather than pip.
 
 ## Run
 
-The preferred launcher from this directory is:
+The preferred launcher is intentionally kept at the repository root:
 
 ```bash
 python main.py
 ```
 
-From the repository root, use package execution:
+The equivalent package command is:
 
 ```bash
-python -m xrd_analysis_dashboard_arpls.main
+python -m xrd_dashboard
 ```
 
-`main_optimized.py` and `xrd_analysis_dashboard_arpls.py` remain as compatibility
-launchers for older scripts and commands.
+`main_optimized.py`, `fitting.py`, and `fitting_arpls.py` are small compatibility
+shims for older beamtime scripts. New code should import from `xrd_dashboard`.
 
 ## UI workflow
 
@@ -75,9 +76,10 @@ Target and background files use the same multi-sheet layout:
 - The requested display Q range must contain target data. The background must
   also cover the slightly expanded Q support required by the fitting transforms.
 
-An optional `ReferencePeaks.xlsx` supplies phase/HKL reference peaks. It is
-searched for beside the target workbook, beside the application, and in the
-current working directory.
+The bundled `xrd_dashboard/resources/ReferencePeaks.xlsx` supplies phase/HKL
+reference peaks. A file beside the target workbook takes priority, followed by
+the bundled file, the legacy repository-root location, and the current working
+directory.
 
 ## Exports
 
@@ -91,37 +93,50 @@ Exports can retain Q or convert it to 2Theta using the wavelength entered in the
 UI. XYE export is always individual. Files are written through temporary sibling
 files and moved into place only after a successful write.
 
-## Module map
+## Project structure
 
-- `main.py` — preferred command-line entry point.
-- `app.py` — Tkinter widgets, application state, and worker coordination.
-- `analysis.py` — validation, parsing, coordinate conversion, fit-job
-  orchestration, and shared result schemas.
-- `data_io.py` — target/background workbook and reference-peak readers.
-- `plotting.py` — pure Matplotlib figure rendering, independent of Tk canvas
-  updates and click markers.
-- `exporting.py` — atomic merged/individual Excel and XYE writers.
-- `theme.py` — accessible palette, fonts, and ttk state styles.
-- `fitting.py` — compatibility fitting API; `fitting_optimized.py` implements
-  reference-background fitting and `fitting_arpls.py` implements arPLS.
-- `main_optimized.py` and `xrd_analysis_dashboard_arpls.py` — legacy import and
-  launch compatibility.
+```text
+.
+├── main.py                       # preferred launcher
+├── xrd_dashboard/
+│   ├── analysis/                 # fitting, arPLS, validation, job orchestration
+│   │   ├── baseline.py
+│   │   ├── fitting.py
+│   │   └── pipeline.py
+│   ├── data/                     # workbook readers and result writers
+│   │   ├── workbooks.py
+│   │   └── exporting.py
+│   ├── ui/                       # Tk application, plots, and visual theme
+│   │   ├── app.py
+│   │   ├── plotting.py
+│   │   └── theme.py
+│   ├── tools/                    # standalone data-preparation commands
+│   ├── resources/                # bundled reference-peak workbook
+│   └── paths.py                  # stable project/resource locations
+├── tests/                        # regression tests
+├── main_optimized.py             # legacy batch-import shim
+├── fitting.py                    # legacy fitting shim
+└── fitting_arpls.py              # legacy arPLS shim
+```
+
+The `__init__.py` files expose the small public API for each package; detailed
+implementations stay in the role-specific modules shown above.
 
 ## Data preparation utilities
 
-`preprocess_xdart_for_dashboard.py` converts xdart IQ CSV/XYE folders into
+`xrd_dashboard.tools.preprocess_xdart` converts xdart IQ CSV/XYE folders into
 normalized target and fused-silica background workbooks plus a processing
 manifest:
 
 ```bash
-python preprocess_xdart_for_dashboard.py --help
+python -m xrd_dashboard.tools.preprocess_xdart --help
 ```
 
-`despike_background_workbook.py` replaces a narrow Q interval in one background
+`xrd_dashboard.tools.despike_background` replaces a narrow Q interval in one background
 sheet by linear interpolation and records correction metadata:
 
 ```bash
-python despike_background_workbook.py --help
+python -m xrd_dashboard.tools.despike_background --help
 ```
 
 ## Tests

@@ -5,11 +5,11 @@ import unittest
 from pathlib import Path
 
 
-PROJECT_PARENT = Path(__file__).resolve().parents[2]
-if str(PROJECT_PARENT) not in sys.path:
-    sys.path.insert(0, str(PROJECT_PARENT))
+PROJECT_DIR = Path(__file__).resolve().parents[1]
+if str(PROJECT_DIR) not in sys.path:
+    sys.path.insert(0, str(PROJECT_DIR))
 
-from xrd_analysis_dashboard_arpls import theme  # noqa: E402
+from xrd_dashboard.ui import theme  # noqa: E402
 
 
 def _relative_luminance(hex_colour: str) -> float:

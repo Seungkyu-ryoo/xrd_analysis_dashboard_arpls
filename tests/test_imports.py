@@ -65,6 +65,29 @@ class ImportSmokeTests(unittest.TestCase):
     def test_direct_import_exposes_dashboard_public_names(self):
         self._assert_importable("main_optimized", PROJECT_DIR)
 
+    def test_direct_legacy_fitting_imports_remain_available(self):
+        code = (
+            "from fitting import run_optimization; "
+            "from fitting_arpls import run_arpls; "
+            "assert callable(run_optimization); assert callable(run_arpls)"
+        )
+        environment = os.environ.copy()
+        environment["PYTHONDONTWRITEBYTECODE"] = "1"
+        completed = subprocess.run(
+            [sys.executable, "-B", "-c", code],
+            cwd=PROJECT_DIR,
+            env=environment,
+            text=True,
+            capture_output=True,
+            timeout=60,
+            check=False,
+        )
+        self.assertEqual(
+            completed.returncode,
+            0,
+            msg=f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}",
+        )
+
     def test_package_exports_background_fitter_and_arpls(self):
         if str(PROJECT_PARENT) not in sys.path:
             sys.path.insert(0, str(PROJECT_PARENT))

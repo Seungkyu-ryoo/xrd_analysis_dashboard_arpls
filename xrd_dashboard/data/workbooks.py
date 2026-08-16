@@ -14,14 +14,10 @@ from typing import Iterable, Optional
 import numpy as np
 import pandas as pd
 
-try:  # Support package imports and execution from this directory.
-    from .analysis import numeric_sort_key, validate_q_range
-except ImportError:  # pragma: no cover - exercised by direct-script imports.
-    from analysis import numeric_sort_key, validate_q_range
+from ..analysis.pipeline import numeric_sort_key, validate_q_range
 
 
 REFERENCE_PHASES = ("m-HfO2", "t-ZrO2", "o-HfO2", "HfTiO2", "TiN")
-REFERENCE_COLORS = ("#C2414B", "#2F855A", "#3157A4", "#C05621", "#7B2CBF")
 REFERENCE_FILENAME = "ReferencePeaks.xlsx"
 
 
@@ -196,7 +192,6 @@ def load_reference_peaks(
 
 
 __all__ = [
-    "REFERENCE_COLORS",
     "REFERENCE_FILENAME",
     "REFERENCE_PHASES",
     "load_reference_peaks",
