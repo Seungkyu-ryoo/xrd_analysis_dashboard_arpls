@@ -1,6 +1,6 @@
-matplotlib
-numpy
-pandas
-pybaselines
-scipy
-openpyxl
+matplotlib>=3.8
+numpy>=1.24
+openpyxl>=3.1
+pandas>=2.0
+pybaselines>=1.0
+scipy>=1.10
