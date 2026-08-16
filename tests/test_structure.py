@@ -27,6 +27,7 @@ class ProjectStructureTests(unittest.TestCase):
             "theme.py",
             "preprocess_xdart_for_dashboard.py",
             "despike_background_workbook.py",
+            "main_optimized.py",
             "xrd_analysis_dashboard_arpls.py",
         )
         for filename in old_flat_modules:

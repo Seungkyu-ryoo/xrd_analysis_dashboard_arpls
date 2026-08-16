@@ -41,8 +41,8 @@ The equivalent package command is:
 python -m xrd_dashboard
 ```
 
-`main_optimized.py`, `fitting.py`, and `fitting_arpls.py` are small compatibility
-shims for older beamtime scripts. New code should import from `xrd_dashboard`.
+`fitting.py` and `fitting_arpls.py` are small compatibility shims for older
+fitting callers. New code should import from `xrd_dashboard`.
 
 ## UI workflow
 
@@ -114,7 +114,6 @@ files and moved into place only after a successful write.
 │   ├── resources/                # bundled reference-peak workbook
 │   └── paths.py                  # stable project/resource locations
 ├── tests/                        # regression tests
-├── main_optimized.py             # legacy batch-import shim
 ├── fitting.py                    # legacy fitting shim
 └── fitting_arpls.py              # legacy arPLS shim
 ```

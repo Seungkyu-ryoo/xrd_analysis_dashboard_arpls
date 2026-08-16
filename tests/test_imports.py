@@ -13,31 +13,10 @@ PROJECT_PARENT = PROJECT_DIR.parent
 
 
 class ImportSmokeTests(unittest.TestCase):
-    REQUIRED_MAIN_NAMES = (
-        "BackgroundFitter",
-        "XRDDashboard",
-        "compute_fit_jobs",
-        "expanded_background_q_range",
-        "load_reference_peaks",
-        "main",
-        "make_param_record",
-        "parse_anchor_lines",
-        "parse_peak_lines",
-        "q_to_2theta",
-        "read_multisheet",
-        "safe_filename_component",
-        "split_position",
-        "validate_q_range",
-    )
-
-    def _assert_importable(self, module_name: str, working_directory: Path) -> None:
-        names = repr(self.REQUIRED_MAIN_NAMES)
-        code = (
-            f"import {module_name} as dashboard; "
-            f"required = {names}; "
-            "missing = [name for name in required if not hasattr(dashboard, name)]; "
-            "assert not missing, missing"
-        )
+    def _assert_launcher_importable(
+        self, module_name: str, working_directory: Path
+    ) -> None:
+        code = f"import {module_name} as launcher; assert callable(launcher.main)"
         with tempfile.TemporaryDirectory() as mpl_config:
             environment = os.environ.copy()
             environment["MPLCONFIGDIR"] = mpl_config
@@ -57,13 +36,13 @@ class ImportSmokeTests(unittest.TestCase):
             msg=f"stdout:\n{completed.stdout}\nstderr:\n{completed.stderr}",
         )
 
-    def test_package_import_exposes_dashboard_public_names(self):
-        self._assert_importable(
-            "xrd_analysis_dashboard_arpls.main_optimized", PROJECT_PARENT
+    def test_package_main_launcher_imports_without_starting_the_gui(self):
+        self._assert_launcher_importable(
+            "xrd_analysis_dashboard_arpls.main", PROJECT_PARENT
         )
 
-    def test_direct_import_exposes_dashboard_public_names(self):
-        self._assert_importable("main_optimized", PROJECT_DIR)
+    def test_direct_main_launcher_imports_without_starting_the_gui(self):
+        self._assert_launcher_importable("main", PROJECT_DIR)
 
     def test_direct_legacy_fitting_imports_remain_available(self):
         code = (
