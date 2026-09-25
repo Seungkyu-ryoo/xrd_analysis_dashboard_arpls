@@ -145,3 +145,9 @@ From this directory:
 ```bash
 python -m unittest discover -s tests -v
 ```
+
+## Contributors
+
+- [@Seungkyu-ryoo](https://github.com/Seungkyu-ryoo) — Project author and maintainer.
+- **Claude (Anthropic)** — AI-assisted development.
+- **Codex (OpenAI)** — AI-assisted development.
